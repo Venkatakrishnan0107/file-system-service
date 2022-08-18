@@ -1,0 +1,15 @@
+server:
+  port: 9090
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAUGYCFT7G44KWXNN5
+      secret-key: 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
+    region:
+      static: ap-south-1
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: venkatbucket0107
