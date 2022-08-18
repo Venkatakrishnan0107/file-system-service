@@ -1,9 +1,7 @@
 package com.filestorage.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,14 +25,18 @@ public class StorageService {
     private AmazonS3 s3Client;
 
     public String uploadFile(MultipartFile multipartFile)  {
-        String fileName = "DummyFileName"+System.currentTimeMillis()+"_"+multipartFile.getOriginalFilename();
+        String fileName = multipartFile.getOriginalFilename();
         File file  = null;
         try {
             file = getConvertedFile(multipartFile);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        s3Client.putObject(new PutObjectRequest(bucketName,fileName,file));
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("image/jpeg");
+        PutObjectResult result = s3Client.putObject(new PutObjectRequest(bucketName,fileName,file).withMetadata(metadata));
+        s3Client.setObjectAcl(bucketName,fileName,CannedAccessControlList.PublicRead);
+        System.out.println("Url..."+s3Client.getUrl(bucketName,fileName));
         file.delete();
         return "File Uploaded "+fileName;
     }
